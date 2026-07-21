@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ customer.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{{ customer.name }}</h1>
+    <a href="{{ url_for('customers.edit_customer', id=customer.id) }}" class="btn">Edit</a>
+</div>
+
+<div class="card">
+    <div class="form-row">
+        <div>
+            <div class="field-label">Phone</div>
+            <div>{{ customer.phone or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Branch</div>
+            <div>{{ customer.branch }}</div>
+        </div>
+        <div>
+            <div class="field-label">Type</div>
+            <div>{{ 'Company' if customer.is_company else 'Individual' }}</div>
+        </div>
+        {% if customer.is_company %}
+        <div>
+            <div class="field-label">GST</div>
+            <div>{{ customer.gst_number or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">PAN</div>
+            <div>{{ customer.pan_number or '—' }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px">
+    <h2 style="font-size:15px;font-weight:500">Vehicles ({{ customer.vehicles|length }})</h2>
+    <a href="{{ url_for('vehicles.new_vehicle', customer_id=customer.id) }}" class="btn btn-primary">Add vehicle</a>
+</div>
+
+{% if customer.vehicles %}
+<table>
+    <thead>
+        <tr>
+            <th>Registration</th>
+            <th>Model</th>
+            <th>Category</th>
+            <th>Passing type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vehicle in customer.vehicles %}
+        <tr onclick="window.location='{{ url_for('vehicles.vehicle_detail', id=vehicle.id) }}'" style="cursor:pointer">
+            <td>{{ vehicle.registration_no or '—' }}</td>
+            <td>{{ vehicle.model }}</td>
+            <td>{{ vehicle.category }}</td>
+            <td>{{ vehicle.passing_type or '—' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="card" style="color:#888;text-align:center">No vehicles yet.</div>
+{% endif %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px">
+    <h2 style="font-size:15px;font-weight:500">Documents</h2>
+</div>
+
+<div class="card">
+    {% set doc_types = [
+        ('aadhaar', 'Aadhaar / KYC'),
+        ('pan', 'PAN card'),
+        ('gst', 'GST certificate'),
+        ('tax_invoice', 'Tax invoice')
+    ] %}
+
+    {% for doc_type, doc_label in doc_types %}
+    {% set doc = customer.documents | selectattr('doc_type', 'equalto', doc_type) | first %}
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0">
+        <div>
+            <div style="font-size:13px;font-weight:500">{{ doc_label }}</div>
+            {% if doc %}
+            <div style="font-size:12px;color:#888;margin-top:2px">
+                <a href="{{ url_for('customers.uploaded_file', filename=doc.filename) }}" target="_blank">View uploaded file</a>
+            </div>
+            {% else %}
+            <div style="font-size:12px;color:#888;margin-top:2px">Not uploaded yet</div>
+            {% endif %}
+        </div>
+        <form method="POST" action="{{ url_for('customers.upload_document', id=customer.id) }}" enctype="multipart/form-data" style="display:flex;align-items:center;gap:8px">
+            <input type="hidden" name="doc_type" value="{{ doc_type }}">
+            <input type="file" name="file" accept=".jpg,.jpeg,.png" style="font-size:12px">
+            <button type="submit" class="btn btn-sm" style="padding:4px 10px;font-size:12px">{{ 'Replace' if doc else 'Upload' }}</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

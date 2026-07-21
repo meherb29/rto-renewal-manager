@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Edit' if customer else 'New' }} Customer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{{ 'Edit' if customer else 'New' }} customer</h1>
+</div>
+
+<div class="card">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full name / company name</label>
+                <input type="text" name="name" value="{{ customer.name if customer else '' }}" required>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" name="phone" value="{{ customer.phone if customer else '' }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Branch</label>
+                <select name="branch">
+                    {% for branch in ['Navi Mumbai', 'Pen', 'Other'] %}
+                    <option value="{{ branch }}" {{ 'selected' if customer and customer.branch == branch else '' }}>{{ branch }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_company" {{ 'checked' if customer and customer.is_company else '' }}>
+                    This is a company
+                </label>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>GST number (companies only)</label>
+                <input type="text" name="gst_number" value="{{ customer.gst_number if customer else '' }}">
+            </div>
+            <div class="form-group">
+                <label>PAN number (companies only)</label>
+                <input type="text" name="pan_number" value="{{ customer.pan_number if customer else '' }}">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ 'Save changes' if customer else 'Add customer' }}</button>
+        <a href="{{ url_for('customers.list_customers') }}" class="btn" style="margin-left:8px">Cancel</a>
+    </form>
+</div>
+{% endblock %}

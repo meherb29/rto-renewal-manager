@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}New Employee{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Add employee</h1>
+</div>
+
+<div class="card">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full name</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Branch</label>
+                <select name="branch">
+                    <option>Navi Mumbai</option>
+                    <option>Pen</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role">
+                    <option value="employee">Employee</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add employee</button>
+        <a href="{{ url_for('employees.list_employees') }}" class="btn" style="margin-left:8px">Cancel</a>
+    </form>
+</div>
+{% endblock %}

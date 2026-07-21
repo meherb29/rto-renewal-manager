@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ vehicle.model }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{{ vehicle.model }}</h1>
+    <a href="{{ url_for('vehicles.edit_vehicle', id=vehicle.id) }}" class="btn">Edit</a>
+</div>
+
+<div class="card">
+    <div class="form-row">
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Customer</div>
+            <div><a href="{{ url_for('customers.customer_detail', id=vehicle.customer.id) }}">{{ vehicle.customer.name }}</a></div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Category</div>
+            <div>{{ vehicle.category }}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Registration</div>
+            <div>{{ vehicle.registration_no or '—' }}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Year</div>
+            <div>{{ vehicle.year_of_manufacture or '—' }}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Chassis no</div>
+            <div>{{ vehicle.chassis_no or '—' }}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Engine no</div>
+            <div>{{ vehicle.engine_no or '—' }}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;color:#888;margin-bottom:3px">Passing type</div>
+            <div>{{ vehicle.passing_type or '—' }}</div>
+        </div>
+    </div>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px">
+    <h2 style="font-size:15px;font-weight:500">Renewals ({{ vehicle.renewals|length }})</h2>
+    <a href="{{ url_for('renewals.new_renewal', vehicle_id=vehicle.id) }}" class="btn btn-primary">Add renewal</a>
+</div>
+
+{% if vehicle.renewals %}
+<table>
+    <thead>
+        <tr>
+            <th>Insurer</th>
+            <th>Policy start</th>
+            <th>Policy end</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for renewal in vehicle.renewals %}
+        <tr onclick="window.location='{{ url_for('renewals.renewal_detail', id=renewal.id) }}'" style="cursor:pointer">
+            <td>{{ renewal.insurer.name if renewal.insurer else '—' }}</td>
+            <td>{{ renewal.policy_start or '—' }}</td>
+            <td>{{ renewal.policy_end or '—' }}</td>
+            <td><span class="badge badge-{{ renewal.status }}">{{ renewal.status }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="card" style="color:#888;text-align:center">No renewals yet.</div>
+{% endif %}
+{% endblock %}

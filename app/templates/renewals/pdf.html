@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insurance Renewal — {{ renewal.vehicle.customer.name }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            color: #1a1a1a;
+            padding: 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .header-title { font-size: 20px; font-weight: 600; }
+        .header-sub { font-size: 12px; color: #555; margin-top: 4px; }
+        .header-ref { font-size: 12px; color: #555; text-align: right; }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #555;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 24px;
+        }
+
+        .field-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 2px;
+        }
+
+        .field-val {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .premium-box {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .premium-label { font-size: 12px; color: #555; }
+        .premium-val { font-size: 22px; font-weight: 600; }
+
+        .docs-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .doc-tag {
+            background: #f0f0f0;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #185FA5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <div class="header-title">Insurance Renewal Document</div>
+        <div class="header-sub">Baldev Engineering — RTO Insurance Services</div>
+    </div>
+    <div class="header-ref">
+        <div>Ref: #{{ renewal.id }}</div>
+        <div>Date: {{ renewal.policy_start or '—' }}</div>
+    </div>
+</div>
+
+<div class="premium-box">
+    <div class="premium-label">Total premium payable</div>
+    <div class="premium-val">₹{{ '{:,.0f}'.format(premium) if premium else '—' }}</div>
+</div>
+
+<div class="section">
+    <div class="section-title">Customer details</div>
+    <div class="grid">
+        <div>
+            <div class="field-label">Name</div>
+            <div class="field-val">{{ renewal.vehicle.customer.name }}</div>
+        </div>
+        <div>
+            <div class="field-label">Type</div>
+            <div class="field-val">{{ 'Company' if renewal.vehicle.customer.is_company else 'Individual' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Phone</div>
+            <div class="field-val">{{ renewal.vehicle.customer.phone or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Branch</div>
+            <div class="field-val">{{ renewal.vehicle.customer.branch }}</div>
+        </div>
+        {% if renewal.vehicle.customer.is_company %}
+        <div>
+            <div class="field-label">GST number</div>
+            <div class="field-val">{{ renewal.vehicle.customer.gst_number or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">PAN number</div>
+            <div class="field-val">{{ renewal.vehicle.customer.pan_number or '—' }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Vehicle details</div>
+    <div class="grid">
+        <div>
+            <div class="field-label">Model</div>
+            <div class="field-val">{{ renewal.vehicle.model }}</div>
+        </div>
+        <div>
+            <div class="field-label">Category</div>
+            <div class="field-val">{{ renewal.vehicle.category }}</div>
+        </div>
+        <div>
+            <div class="field-label">Registration no</div>
+            <div class="field-val">{{ renewal.vehicle.registration_no or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Passing type</div>
+            <div class="field-val">{{ renewal.vehicle.passing_type or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Chassis no</div>
+            <div class="field-val">{{ renewal.vehicle.chassis_no or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Engine no</div>
+            <div class="field-val">{{ renewal.vehicle.engine_no or '—' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Policy details</div>
+    <div class="grid">
+        <div>
+            <div class="field-label">Insurer</div>
+            <div class="field-val">{{ renewal.insurer.name if renewal.insurer else '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Policy number</div>
+            <div class="field-val">{{ renewal.policy_number or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Policy start</div>
+            <div class="field-val">{{ renewal.policy_start or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">Policy end</div>
+            <div class="field-val">{{ renewal.policy_end or '—' }}</div>
+        </div>
+        <div>
+            <div class="field-label">IDV</div>
+            <div class="field-val">₹{{ '{:,.0f}'.format(renewal.idv) if renewal.idv else '—' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Documents enclosed</div>
+    <div class="docs-list">
+        <span class="doc-tag">Aadhaar / KYC</span>
+        {% if renewal.vehicle.customer.is_company %}
+        <span class="doc-tag">GST certificate</span>
+        <span class="doc-tag">PAN card</span>
+        {% endif %}
+        <span class="doc-tag">Tax invoice</span>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">Attached documents</div>
+    {% set documents = renewal.vehicle.customer.documents %}
+    {% if documents %}
+        {% for doc in documents %}
+        <div style="margin-bottom:16px">
+            <div style="font-size:10px;color:#888;margin-bottom:6px;text-transform:uppercase">
+                {{ doc.doc_type.replace('_', ' ').title() }}
+            </div>
+            <img src="{{ url_for('customers.uploaded_file', filename=doc.filename, _external=True) }}"
+                 style="max-width:100%;border:1px solid #e0e0e0;border-radius:4px">
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="color:#888;font-size:12px">No documents uploaded for this customer.</div>
+    {% endif %}
+</div>
+
+<div class="footer">
+    <div>Generated by BE RTO Manager</div>
+    <div>Baldev Engineering — Authorized Dealership</div>
+</div>
+
+<button class="print-btn" onclick="window.print()">Save as PDF</button>
+
+</body>
+</html>

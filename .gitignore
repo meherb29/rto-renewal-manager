@@ -1,0 +1,19 @@
+# database
+*.db
+*.sqlite3
+instance/
+
+# environment
+.env
+venv/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code
+.vscode/
+
+# uploads
+app/uploads/

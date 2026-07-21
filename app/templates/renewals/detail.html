@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Renewal #{{ renewal.id }}{% endblock %}
+
+{% block content %}
+
+{% if not renewal.data_confirmed %}
+<div style="background:#FAEEDA;border:1px solid #EF9F27;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#633806">
+    Last confirmed data from {{ renewal.last_known_year }}. Contact customer to verify current policy dates.
+</div>
+{% endif %}
+
+<div class="page-header">
+    <div>
+        <div style="font-size:12px;color:#888;margin-bottom:4px">
+            <a href="{{ url_for('customers.customer_detail', id=renewal.vehicle.customer.id) }}">{{ renewal.vehicle.customer.name }}</a>
+            › <a href="{{ url_for('vehicles.vehicle_detail', id=renewal.vehicle.id) }}">{{ renewal.vehicle.model }}</a>
+            › Renewal #{{ renewal.id }}
+        </div>
+        <h1 class="page-title">{{ renewal.vehicle.model }} — {{ renewal.insurer.name if renewal.insurer else 'No insurer' }}</h1>
+    </div>
+    <div style="display:flex;gap:8px">
+        <a href="{{ url_for('renewals.edit_renewal', id=renewal.id) }}" class="btn">Edit</a>
+        <a href="{{ url_for('renewals.generate_pdf', id=renewal.id) }}" class="btn btn-primary">Generate PDF</a>
+    </div>
+</div>
+
+<div style="margin-bottom:20px">
+    <span class="badge badge-{{ renewal.status.replace('_','-') }}">{{ renewal.status.replace('_',' ') }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+        <div class="card">
+            <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Customer</div>
+            <div class="form-row">
+                <div>
+                    <div class="field-label">Name</div>
+                    <div>{{ renewal.vehicle.customer.name }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Phone</div>
+                    <div>{{ renewal.vehicle.customer.phone or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Branch</div>
+                    <div>{{ renewal.vehicle.customer.branch }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Type</div>
+                    <div>{{ 'Company' if renewal.vehicle.customer.is_company else 'Individual' }}</div>
+                </div>
+            </div>
+
+            <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;margin-top:20px">
+                Customer documents
+            </div>
+            {% set doc_types = [('aadhaar','Aadhaar / KYC'),('pan','PAN card'),('gst','GST certificate'),('tax_invoice','Tax invoice')] %}
+            {% for doc_type, doc_label in doc_types %}
+            {% set doc = renewal.vehicle.customer.documents | selectattr('doc_type', 'equalto', doc_type) | first %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0">
+                <div style="font-size:13px">{{ doc_label }}</div>
+                {% if doc %}
+                <a href="{{ url_for('customers.uploaded_file', filename=doc.filename) }}" target="_blank" class="btn" style="padding:3px 10px;font-size:12px">View</a>
+                {% else %}
+                <span style="font-size:12px;color:#A32D2D">Missing</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div style="margin-top:10px">
+                <a href="{{ url_for('customers.customer_detail', id=renewal.vehicle.customer.id) }}" style="font-size:12px;color:#185FA5">Manage documents →</a>
+            </div>
+        </div>    
+
+        <div class="card">
+            <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Vehicle</div>
+            <div class="form-row">
+                <div>
+                    <div class="field-label">Model</div>
+                    <div>{{ renewal.vehicle.model }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Category</div>
+                    <div>{{ renewal.vehicle.category }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Registration</div>
+                    <div>{{ renewal.vehicle.registration_no or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Passing type</div>
+                    <div>{{ renewal.vehicle.passing_type or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Chassis</div>
+                    <div>{{ renewal.vehicle.chassis_no or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Engine</div>
+                    <div>{{ renewal.vehicle.engine_no or '—' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Policy</div>
+            <div class="form-row">
+                <div>
+                    <div class="field-label">Insurer</div>
+                    <div>{{ renewal.insurer.name if renewal.insurer else '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Policy number</div>
+                    <div>{{ renewal.policy_number or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Start</div>
+                    <div>{{ renewal.policy_start or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">End</div>
+                    <div>{{ renewal.policy_end or '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">IDV</div>
+                    <div>{{ '₹{:,.0f}'.format(renewal.idv) if renewal.idv else '—' }}</div>
+                </div>
+                <div>
+                    <div class="field-label">Reminder due</div>
+                    <div>{{ renewal.reminder_due or '—' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em">Follow-up log</div>
+            </div>
+
+            {% if renewal.followups %}
+                {% for f in renewal.followups %}
+                <div style="padding:10px 0;border-bottom:1px solid #f0f0f0">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        <span class="badge badge-confirmed">{{ f.outcome.replace('_',' ') }}</span>
+                        <span style="font-size:12px;color:#888">{{ f.contacted_on }}</span>
+                    </div>
+                    <div style="font-size:13px">{{ f.notes or '—' }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="color:#888;font-size:13px;margin-bottom:16px">No follow-ups logged yet.</div>
+            {% endif %}
+
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e0e0">
+                <div style="font-size:12px;color:#888;margin-bottom:10px">Add follow-up</div>
+                <form method="POST" action="{{ url_for('renewals.add_followup', id=renewal.id) }}">
+                    <input type="hidden" name="employee_id" value="1">
+                    <div class="form-row" style="margin-bottom:10px">
+                        <div class="form-group" style="margin:0">
+                            <label>Date</label>
+                            <input type="date" name="contacted_on" value="{{ today }}">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label>Outcome</label>
+                            <select name="outcome">
+                                <option value="called_no_answer">Called — no answer</option>
+                                <option value="called_spoke">Called — spoke</option>
+                                <option value="whatsapp_sent">WhatsApp sent</option>
+                                <option value="quote_sent">Quote sent</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="2" placeholder="What was discussed..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="margin:0">
+                            <label>Update status</label>
+                            <select name="status">
+                                <option value="">Don't change</option>
+                                <option value="open">Open</option>
+                                <option value="in_progress">In progress</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="lapsed">Lapsed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top:10px">Save follow-up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

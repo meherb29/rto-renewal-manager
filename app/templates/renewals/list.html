@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Renewals{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Renewals</h1>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Insurer</th>
+            <th>Policy end</th>
+            <th>Reminder due</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for renewal in renewals %}
+        <tr onclick="window.location='{{ url_for('renewals.renewal_detail', id=renewal.id) }}'" style="cursor:pointer">
+            <td>{{ renewal.vehicle.customer.name }}</td>
+            <td>{{ renewal.vehicle.model }}</td>
+            <td>{{ renewal.insurer.name if renewal.insurer else '—' }}</td>
+            <td>{{ renewal.policy_end or '—' }}</td>
+            <td>{{ renewal.reminder_due or '—' }}</td>
+            <td><span class="badge badge-{{ renewal.status.replace('_', '-') }}">{{ renewal.status }}</span></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" style="text-align:center;color:#888;padding:24px">No renewals yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

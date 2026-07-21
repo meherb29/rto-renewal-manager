@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Employee{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Edit employee</h1>
+</div>
+
+<div class="card">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full name</label>
+                <input type="text" name="name" value="{{ employee.name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="{{ employee.email }}" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Branch</label>
+                <select name="branch">
+                    {% for branch in ['Navi Mumbai', 'Pen', 'Other'] %}
+                    <option value="{{ branch }}" {{ 'selected' if employee.branch == branch else '' }}>{{ branch }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role">
+                    <option value="employee" {{ 'selected' if employee.role == 'employee' else '' }}>Employee</option>
+                    <option value="admin" {{ 'selected' if employee.role == 'admin' else '' }}>Admin</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>New password (leave blank to keep current)</label>
+            <input type="password" name="password" placeholder="Leave blank to keep unchanged">
+        </div>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="{{ url_for('employees.list_employees') }}" class="btn" style="margin-left:8px">Cancel</a>
+    </form>
+</div>
+{% endblock %}

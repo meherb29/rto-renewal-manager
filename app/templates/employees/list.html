@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Employees{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Employees</h1>
+    <div style="display:flex;gap:8px;align-items:center">
+        <a href="{{ url_for('employees.export_data') }}" class="btn">Export all data</a>
+        <a href="{{ url_for('employees.new_employee') }}" class="btn btn-primary">Add employee</a>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Branch</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for employee in employees %}
+        <tr onclick="window.location='{{ url_for('employees.edit_employee', id=employee.id) }}'" style="cursor:pointer">
+            <td>{{ employee.name }}</td>
+            <td>{{ employee.email }}</td>
+            <td>{{ employee.branch }}</td>
+            <td>{{ employee.role }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" style="text-align:center;color:#888;padding:24px">No employees yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

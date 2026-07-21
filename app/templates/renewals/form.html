@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}New Renewal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">New renewal — {{ vehicle.model }}</h1>
+</div>
+
+<div class="card">
+    <form method="POST" action="{{ url_for('renewals.create_renewal') }}">
+        <input type="hidden" name="vehicle_id" value="{{ vehicle.id }}">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Insurer</label>
+                <select name="insurer_id">
+                    <option value="">Select insurer</option>
+                    {% for insurer in insurers %}
+                    <option value="{{ insurer.id }}">{{ insurer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Policy number</label>
+                <input type="text" name="policy_number" placeholder="e.g. 110522423430011766">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Policy start date</label>
+                <input type="date" name="policy_start">
+            </div>
+            <div class="form-group">
+                <label>Policy end date</label>
+                <input type="date" name="policy_end">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>IDV (₹)</label>
+                <input type="number" step="0.01" name="idv" placeholder="e.g. 10680">
+            </div>
+            <div class="form-group">
+                <label>Assigned to</label>
+                <select name="employee_id">
+                    <option value="">Select employee</option>
+                    {% for employee in employees %}
+                    <option value="{{ employee.id }}">{{ employee.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Data confidence</label>
+                <select name="data_confirmed">
+                    <option value="confirmed">Confirmed — customer gave us these dates</option>
+                    <option value="estimated">Estimated — based on last known data</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Last known year (if estimated)</label>
+                <input type="number" name="last_known_year" placeholder="e.g. 2024">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" rows="3" placeholder="Any extra context..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create renewal</button>
+        <a href="{{ url_for('vehicles.vehicle_detail', id=vehicle.id) }}" class="btn" style="margin-left:8px">Cancel</a>
+    </form>
+</div>
+{% endblock %}

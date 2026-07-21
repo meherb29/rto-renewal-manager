@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <span style="font-size:13px;color:#888">{{ today.strftime('%d %b %Y') }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
+    <div class="card" style="margin:0">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Urgent (7 days)</div>
+        <div style="font-size:28px;font-weight:500;color:#A32D2D">{{ urgent|length }}</div>
+    </div>
+    <div class="card" style="margin:0">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Upcoming (60 days)</div>
+        <div style="font-size:28px;font-weight:500;color:#854F0B">{{ upcoming|length }}</div>
+    </div>
+    <div class="card" style="margin:0">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">Overdue</div>
+        <div style="font-size:28px;font-weight:500;color:#A32D2D">{{ overdue|length }}</div>
+    </div>
+</div>
+
+{% if overdue %}
+<div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px">Overdue — policy already expired</div>
+<table style="margin-bottom:24px">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Expired</th>
+            <th>Insurer</th>
+            <th>Employee</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for renewal in overdue %}
+        <tr onclick="window.location='{{ url_for('renewals.renewal_detail', id=renewal.id) }}'" style="cursor:pointer">
+            <td>{{ renewal.vehicle.customer.name }}</td>
+            <td>{{ renewal.vehicle.model }}</td>
+            <td style="color:#A32D2D;font-weight:500">{{ renewal.policy_end }}</td>
+            <td>{{ renewal.insurer.name if renewal.insurer else '—' }}</td>
+            <td>{{ renewal.employee.name if renewal.employee else '—' }}</td>
+            <td><span class="badge badge-{{ renewal.status.replace('_','-') }}">{{ renewal.status.replace('_',' ') }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if urgent %}
+<div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px">Urgent — expires within 7 days</div>
+<table style="margin-bottom:24px">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Policy end</th>
+            <th>Insurer</th>
+            <th>Employee</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for renewal in urgent %}
+        <tr onclick="window.location='{{ url_for('renewals.renewal_detail', id=renewal.id) }}'" style="cursor:pointer">
+            <td>{{ renewal.vehicle.customer.name }}</td>
+            <td>{{ renewal.vehicle.model }}</td>
+            <td style="color:#A32D2D;font-weight:500">{{ renewal.policy_end }}</td>
+            <td>{{ renewal.insurer.name if renewal.insurer else '—' }}</td>
+            <td>{{ renewal.employee.name if renewal.employee else '—' }}</td>
+            <td><span class="badge badge-{{ renewal.status.replace('_','-') }}">{{ renewal.status.replace('_',' ') }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+{% if upcoming %}
+<div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px">Upcoming — expires within 60 days</div>
+<table>
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Policy end</th>
+            <th>Insurer</th>
+            <th>Employee</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for renewal in upcoming %}
+        <tr onclick="window.location='{{ url_for('renewals.renewal_detail', id=renewal.id) }}'" style="cursor:pointer">
+            <td>{{ renewal.vehicle.customer.name }}</td>
+            <td>{{ renewal.vehicle.model }}</td>
+            <td style="color:#854F0B;font-weight:500">{{ renewal.policy_end }}</td>
+            <td>{{ renewal.insurer.name if renewal.insurer else '—' }}</td>
+            <td>{{ renewal.employee.name if renewal.employee else '—' }}</td>
+            <td><span class="badge badge-{{ renewal.status.replace('_','-') }}">{{ renewal.status.replace('_',' ') }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if not urgent and not upcoming and not overdue %}
+<div class="card" style="text-align:center;color:#888;padding:40px">
+    All clear — no renewals need attention right now.
+</div>
+{% endif %}
+
+{% endblock %}
